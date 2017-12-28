@@ -56,7 +56,7 @@ namespace Lykke.Service.Zcash.SignService
                 var appSettings = Configuration.LoadSettings<AppSettings>();
                 Log = CreateLogWithSlack(services, appSettings);
 
-                builder.RegisterModule(new ServiceModule(appSettings.Nested(x => x.Zcash.SignServiceService), Log));
+                builder.RegisterModule(new ServiceModule(appSettings.Nested(x => x.ZcashSignService), Log));
                 builder.Populate(services);
                 ApplicationContainer = builder.Build();
 
@@ -169,7 +169,7 @@ namespace Lykke.Service.Zcash.SignService
 
             aggregateLogger.AddLog(consoleLogger);
 
-            var dbLogConnectionStringManager = settings.Nested(x => x.Zcash.SignServiceService.Db.LogsConnString);
+            var dbLogConnectionStringManager = settings.Nested(x => x.ZcashSignService.Db.LogsConnString);
             var dbLogConnectionString = dbLogConnectionStringManager.CurrentValue;
 
             if (string.IsNullOrEmpty(dbLogConnectionString))
@@ -182,7 +182,7 @@ namespace Lykke.Service.Zcash.SignService
                 throw new InvalidOperationException($"LogsConnString {dbLogConnectionString} is not filled in settings");
 
             var persistenceManager = new LykkeLogToAzureStoragePersistenceManager(
-                AzureTableStorage<LogEntity>.Create(dbLogConnectionStringManager, "Zcash.SignServiceLog", consoleLogger),
+                AzureTableStorage<LogEntity>.Create(dbLogConnectionStringManager, "ZcashSignServiceLog", consoleLogger),
                 consoleLogger);
 
             // Creating slack notification service, which logs own azure queue processing messages to aggregate log

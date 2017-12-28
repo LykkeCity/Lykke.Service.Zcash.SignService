@@ -6,17 +6,19 @@ using Lykke.Service.Zcash.SignService.Core.Settings.ServiceSettings;
 using Lykke.Service.Zcash.SignService.Services;
 using Lykke.SettingsReader;
 using Microsoft.Extensions.DependencyInjection;
+using NBitcoin;
+using NBitcoin.Zcash;
 
 namespace Lykke.Service.Zcash.SignService.Modules
 {
     public class ServiceModule : Module
     {
-        private readonly IReloadingManager<Zcash.SignServiceSettings> _settings;
+        private readonly IReloadingManager<ZcashSignServiceSettings> _settings;
         private readonly ILog _log;
         // NOTE: you can remove it if you don't need to use IServiceCollection extensions to register service specific dependencies
         private readonly IServiceCollection _services;
 
-        public ServiceModule(IReloadingManager<Zcash.SignServiceSettings> settings, ILog log)
+        public ServiceModule(IReloadingManager<ZcashSignServiceSettings> settings, ILog log)
         {
             _settings = settings;
             _log = log;
@@ -45,6 +47,17 @@ namespace Lykke.Service.Zcash.SignService.Modules
 
             builder.RegisterType<ShutdownManager>()
                 .As<IShutdownManager>();
+
+            ZcashNetworks.Register();
+
+            builder.RegisterInstance(Network.GetNetwork(_settings.CurrentValue.NetworkType))
+                .As<Network>();
+
+            builder.RegisterType<TransactionService>()
+                .As<ITransactionService>();
+
+            builder.RegisterType<WalletService>()
+                .As<IWalletService>();
 
             // TODO: Add your dependencies here
 

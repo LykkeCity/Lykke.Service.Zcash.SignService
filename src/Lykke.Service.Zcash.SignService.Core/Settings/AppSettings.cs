@@ -5,7 +5,7 @@ namespace Lykke.Service.Zcash.SignService.Core.Settings
 {
     public class AppSettings
     {
-        public Zcash.SignServiceSettings Zcash.SignServiceService { get; set; }
+        public ZcashSignServiceSettings ZcashSignService { get; set; }
         public SlackNotificationsSettings SlackNotifications { get; set; }
     }
 }

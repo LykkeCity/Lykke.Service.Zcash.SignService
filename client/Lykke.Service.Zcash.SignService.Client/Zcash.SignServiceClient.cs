@@ -3,11 +3,11 @@ using Common.Log;
 
 namespace Lykke.Service.Zcash.SignService.Client
 {
-    public class Zcash.SignServiceClient : IZcash.SignServiceClient, IDisposable
+    public class ZcashSignServiceClient : IZcashSignServiceClient, IDisposable
     {
         private readonly ILog _log;
 
-        public Zcash.SignServiceClient(string serviceUrl, ILog log)
+        public ZcashSignServiceClient(string serviceUrl, ILog log)
         {
             _log = log;
         }

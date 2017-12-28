@@ -8,12 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Lykke.Common" Version="3.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Domain\" />
-    <Folder Include="Services\" />
+    <PackageReference Include="BitcoinLib" Version="1.6.0" />
+    <PackageReference Include="Lykke.Common" Version="3.1.0" />
+    <PackageReference Include="NBitcoin" Version="4.0.0.50" />
+    <PackageReference Include="NBitcoin.Zcash" Version="1.0.4" />
   </ItemGroup>
 
 </Project>

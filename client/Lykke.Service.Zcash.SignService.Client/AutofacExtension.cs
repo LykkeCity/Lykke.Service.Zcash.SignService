@@ -6,7 +6,7 @@ namespace Lykke.Service.Zcash.SignService.Client
 {
     public static class AutofacExtension
     {
-        public static void RegisterZcash.SignServiceClient(this ContainerBuilder builder, string serviceUrl, ILog log)
+        public static void RegisterZcashSignServiceClient(this ContainerBuilder builder, string serviceUrl, ILog log)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
             if (serviceUrl == null) throw new ArgumentNullException(nameof(serviceUrl));
@@ -14,15 +14,15 @@ namespace Lykke.Service.Zcash.SignService.Client
             if (string.IsNullOrWhiteSpace(serviceUrl))
                 throw new ArgumentException("Value cannot be null or whitespace.", nameof(serviceUrl));
 
-            builder.RegisterType<Zcash.SignServiceClient>()
+            builder.RegisterType<ZcashSignServiceClient>()
                 .WithParameter("serviceUrl", serviceUrl)
-                .As<IZcash.SignServiceClient>()
+                .As<IZcashSignServiceClient>()
                 .SingleInstance();
         }
 
-        public static void RegisterZcash.SignServiceClient(this ContainerBuilder builder, Zcash.SignServiceServiceClientSettings settings, ILog log)
+        public static void RegisterZcashSignServiceClient(this ContainerBuilder builder, ZcashSignServiceClientSettings settings, ILog log)
         {
-            builder.RegisterZcash.SignServiceClient(settings?.ServiceUrl, log);
+            builder.RegisterZcashSignServiceClient(settings?.ServiceUrl, log);
         }
     }
 }
