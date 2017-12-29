@@ -3,18 +3,18 @@ using System.Collections.Generic;
 using System.Net;
 using System.Text;
 using Lykke.Service.Zcash.SignService.Core.Services;
-using Lykke.Service.Zcash.SignService.Models.Wallet;
+using Lykke.Service.Zcash.SignService.Models.Wallets;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Lykke.Service.Zcash.SignService.Controllers
 {
-    [Route("api/wallets")]
-    public class WalletController : Controller
+    [Route("/api/wallets")]
+    public class WalletsController : Controller
     {
         private readonly IWalletService _walletService;
 
-        public WalletController(IWalletService walletService)
+        public WalletsController(IWalletService walletService)
         {
             _walletService = walletService;
         }
@@ -24,9 +24,9 @@ namespace Lykke.Service.Zcash.SignService.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        public CreateOkResponse Create()
+        public CreateTransparentWalletResponse CreateTransaprentWallet()
         {
-            return new CreateOkResponse(_walletService.CreateTransparentWallet());
+            return new CreateTransparentWalletResponse(_walletService.CreateTransparentWallet());
         }
     }
 }

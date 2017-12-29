@@ -10,7 +10,7 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Lykke.Service.Zcash.SignService.Controllers
 {
-    [Route("api/sign")]
+    [Route("/api/sign")]
     public class SignController : Controller
     {
         private readonly ITransactionService _signService;
@@ -21,8 +21,8 @@ namespace Lykke.Service.Zcash.SignService.Controllers
         }
 
         [HttpPost]
-        [ProducesResponseType(typeof(SignTransactionOkResponse), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(SignTransactionResponse), 200)]
+        [ProducesResponseType(typeof(ErrorResponse), 400)]
         public IActionResult SignTransaction([FromBody]SignTransactionRequest signRequest)
         {
             if (!ModelState.IsValid)
@@ -32,7 +32,7 @@ namespace Lykke.Service.Zcash.SignService.Controllers
 
             var tx = _signService.Sign(signRequest.Tx, signRequest.Coins, signRequest.Keys);
 
-            return Ok(new SignTransactionOkResponse(tx));
+            return Ok(new SignTransactionResponse(tx));
         }
     }
 }
