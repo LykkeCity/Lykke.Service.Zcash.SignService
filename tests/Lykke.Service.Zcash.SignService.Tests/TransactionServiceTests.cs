@@ -33,7 +33,7 @@ namespace Lykke.Service.Zcash.SignService.Tests
                 .AddCoins(prevTx.Outputs.AsCoins().Where(c => c.ScriptPubKey.GetDestinationAddress(network).ToString() == from).ToArray())
                 .Send(toAddress, Money.Coins(1))
                 .SetChange(fromAddress)
-                .SendFees(Money.Cents(1))
+                .SendFees(txBuilder.EstimateFees(new FeeRate(Money.Satoshis(1))))
                 .BuildTransaction(false);
             spentCoins = txBuilder.FindSpentCoins(tx);
             service = new TransactionService();
@@ -43,7 +43,7 @@ namespace Lykke.Service.Zcash.SignService.Tests
         public void ShouldSignTransaction()
         {
             // Arrange
-
+            
             // Act
             var signedTransactionHex = service.Sign(tx, spentCoins, new[] { fromKey });
             var signedTx = Transaction.Parse(signedTransactionHex);
