@@ -28,7 +28,7 @@ namespace Lykke.Service.Zcash.SignService.Models.Sign
             {
                 try
                 {
-                    (Tx, Coins) = Serializer.ToObject<(Transaction tx, ICoin[] coins)>(TransactionHex);
+                    (Tx, Coins) = Serializer.ToObject<(Transaction, ICoin[])>(TransactionHex);
                 }
                 catch
                 {
