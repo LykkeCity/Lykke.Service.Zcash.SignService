@@ -33,7 +33,8 @@ namespace Lykke.Service.Zcash.SignService.Tests
                 .AddCoins(prevTx.Outputs.AsCoins().Where(c => c.ScriptPubKey.GetDestinationAddress(network).ToString() == from).ToArray())
                 .Send(toAddress, Money.Coins(1))
                 .SetChange(fromAddress)
-                .SendFees(txBuilder.EstimateFees(new FeeRate(Money.Satoshis(1))))
+                .SubtractFees()
+                .SendFees(txBuilder.EstimateFees(new FeeRate(Money.Satoshis(1024))))
                 .BuildTransaction(false);
             spentCoins = txBuilder.FindSpentCoins(tx);
             service = new TransactionService();
@@ -49,7 +50,10 @@ namespace Lykke.Service.Zcash.SignService.Tests
             var signedTx = Transaction.Parse(signedTransactionHex);
 
             // Assert
-            Assert.True(txBuilder.Verify(signedTx, out TransactionPolicyError[] errors));
+            Assert.True(new TransactionBuilder()
+                .AddCoins(spentCoins)
+                .SetTransactionPolicy(new StandardTransactionPolicy { CheckFee = false })
+                .Verify(signedTx, out var errors));
         }
     }
 }
