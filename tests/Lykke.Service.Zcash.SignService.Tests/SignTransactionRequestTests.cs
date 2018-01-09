@@ -21,7 +21,7 @@ namespace Lykke.Service.Zcash.SignService.Tests
             var body = JsonConvert.SerializeObject(new
             {
                 PrivateKeys = new[] { txSvcTests.fromPrivateKey },
-                TransactionHex = Serializer.ToString((txSvcTests.tx, txSvcTests.spentCoins))
+                TransactionContext = Serializer.ToString((txSvcTests.tx, txSvcTests.spentCoins))
             });
 
             // Act
@@ -40,7 +40,7 @@ namespace Lykke.Service.Zcash.SignService.Tests
             var body = JsonConvert.SerializeObject(new
             {
                 PrivateKeys = new[] { txSvcTests.fromPrivateKey },
-                TransactionHex = Serializer.ToString(((Transaction)null, txSvcTests.spentCoins))
+                TransactionContext = Serializer.ToString(((Transaction)null, txSvcTests.spentCoins))
             });
 
             // Act
@@ -49,7 +49,7 @@ namespace Lykke.Service.Zcash.SignService.Tests
 
             // Assert
             Assert.NotEmpty(validationResult);
-            Assert.Contains(nameof(SignTransactionRequest.TransactionHex), validationResult.First().MemberNames);
+            Assert.Contains(nameof(SignTransactionRequest.TransactionContext), validationResult.First().MemberNames);
         }
 
         [Fact]
@@ -69,7 +69,7 @@ namespace Lykke.Service.Zcash.SignService.Tests
 
             // Assert
             Assert.NotEmpty(validationResult);
-            Assert.Contains(nameof(SignTransactionRequest.TransactionHex), validationResult.First().MemberNames);
+            Assert.Contains(nameof(SignTransactionRequest.TransactionContext), validationResult.First().MemberNames);
         }
 
         [Fact]
@@ -80,7 +80,7 @@ namespace Lykke.Service.Zcash.SignService.Tests
             var body = JsonConvert.SerializeObject(new
             {
                 PrivateKeys = new[] { "invalid" },
-                TransactionHex = Serializer.ToString((txSvcTests.tx, txSvcTests.spentCoins))
+                TransactionContext = Serializer.ToString((txSvcTests.tx, txSvcTests.spentCoins))
             });
 
             // Act

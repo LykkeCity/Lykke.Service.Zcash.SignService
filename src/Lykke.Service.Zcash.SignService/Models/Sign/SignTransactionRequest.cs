@@ -11,13 +11,20 @@ namespace Lykke.Service.Zcash.SignService.Models.Sign
     [DataContract]
     public class SignTransactionRequest : IValidatableObject
     {
-        [Required, DataMember] public string[]    PrivateKeys    { get; set; }
-        [Required, DataMember] public string      TransactionHex { get; set; }
-                               public Transaction Tx             { get; private set; }
-                               public ICoin[]     Coins          { get; private set; }
-                               public Key[]       Keys           { get; private set; }
-                                                        
+        [DataMember]
+        [Required]
+        public string[] PrivateKeys { get; set; }
 
+        [DataMember]
+        [Required]
+        public string TransactionContext { get; set; }
+
+        public Transaction Tx { get; private set; }
+
+        public ICoin[] Coins { get; private set; }
+
+        public Key[] Keys { get; private set; }
+                                                        
         [OnDeserialized]
         public void Init(StreamingContext streamingContext = default)
         {
@@ -28,7 +35,7 @@ namespace Lykke.Service.Zcash.SignService.Models.Sign
             {
                 try
                 {
-                    (Tx, Coins) = Serializer.ToObject<(Transaction, ICoin[])>(TransactionHex);
+                    (Tx, Coins) = Serializer.ToObject<(Transaction, ICoin[])>(TransactionContext);
                 }
                 catch
                 {
@@ -57,7 +64,7 @@ namespace Lykke.Service.Zcash.SignService.Models.Sign
 
             if (Tx == null || Coins == null || Coins.Length == 0)
             {
-                result.Add(new ValidationResult("Invalud transaction data", new[] { nameof(TransactionHex) }));
+                result.Add(new ValidationResult("Invalud transaction data", new[] { nameof(TransactionContext) }));
             }
 
             if (Keys == null || Keys.Length == 0)
