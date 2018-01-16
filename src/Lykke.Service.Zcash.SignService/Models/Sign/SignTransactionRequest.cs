@@ -64,12 +64,12 @@ namespace Lykke.Service.Zcash.SignService.Models.Sign
 
             if (Tx == null || Coins == null || Coins.Length == 0)
             {
-                result.Add(new ValidationResult("Invalud transaction data", new[] { nameof(TransactionContext) }));
+                result.Add(new ValidationResult("Invalid transaction data", new[] { nameof(TransactionContext) }));
             }
 
             if (Keys == null || Keys.Length == 0)
             {
-                result.Add(new ValidationResult("Invalud key(s)", new[] { nameof(PrivateKeys) }));
+                result.Add(new ValidationResult("Invalid key(s)", new[] { nameof(PrivateKeys) }));
             }
 
             return result;
