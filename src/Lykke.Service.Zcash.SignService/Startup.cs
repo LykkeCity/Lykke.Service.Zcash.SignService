@@ -16,6 +16,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 
 namespace Lykke.Service.Zcash.SignService
 {
@@ -43,13 +45,18 @@ namespace Lykke.Service.Zcash.SignService
                 services.AddMvc()
                     .AddJsonOptions(options =>
                     {
-                        options.SerializerSettings.ContractResolver =
-                            new Newtonsoft.Json.Serialization.DefaultContractResolver();
+                        options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                        options.SerializerSettings.Converters.Add(new StringEnumConverter
+                        {
+                            CamelCaseText = true
+                        });
                     });
 
                 services.AddSwaggerGen(options =>
                 {
                     options.DefaultLykkeConfiguration("v1", "Zcash.SignService API");
+                    options.DescribeAllEnumsAsStrings();
+                    options.DescribeStringEnumsInCamelCase();
                 });
 
                 var builder = new ContainerBuilder();
@@ -78,7 +85,7 @@ namespace Lykke.Service.Zcash.SignService
                     app.UseDeveloperExceptionPage();
                 }
 
-                app.UseLykkeMiddleware("Zcash.SignService", ex => new { Message = "Technical problem" });
+                app.UseLykkeMiddleware("Zcash.SignService", ex => new { Message = ex.ToString() });
 
                 app.UseMvc();
                 app.UseSwagger(c =>
