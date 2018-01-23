@@ -13,6 +13,11 @@ namespace Lykke.Service.Zcash.SignService.Tests
 {
     public class SignTransactionRequestTests
     {
+        public string SerializeContext(Transaction tx, ICoin[] coins)
+        {
+            return Convert.ToBase64String(Encoding.UTF8.GetBytes(Serializer.ToString((tx, coins))));
+        }
+
         [Fact]
         public void ShouldSerializeDeserializeData()
         {
@@ -21,7 +26,7 @@ namespace Lykke.Service.Zcash.SignService.Tests
             var body = JsonConvert.SerializeObject(new
             {
                 PrivateKeys = new[] { txSvcTests.fromPrivateKey },
-                TransactionContext = Serializer.ToString((txSvcTests.tx, txSvcTests.spentCoins))
+                TransactionContext = SerializeContext(txSvcTests.tx, txSvcTests.spentCoins)
             });
 
             // Act
@@ -40,7 +45,7 @@ namespace Lykke.Service.Zcash.SignService.Tests
             var body = JsonConvert.SerializeObject(new
             {
                 PrivateKeys = new[] { txSvcTests.fromPrivateKey },
-                TransactionContext = Serializer.ToString(((Transaction)null, txSvcTests.spentCoins))
+                TransactionContext = SerializeContext((Transaction)null, txSvcTests.spentCoins)
             });
 
             // Act
@@ -60,7 +65,7 @@ namespace Lykke.Service.Zcash.SignService.Tests
             var body = JsonConvert.SerializeObject(new
             {
                 PrivateKeys = new[] { txSvcTests.fromPrivateKey },
-                TransactionHex = Serializer.ToString((txSvcTests.tx, (ICoin[])null))
+                TransactionHex = SerializeContext(txSvcTests.tx, (ICoin[])null)
             });
 
             // Act
@@ -80,7 +85,7 @@ namespace Lykke.Service.Zcash.SignService.Tests
             var body = JsonConvert.SerializeObject(new
             {
                 PrivateKeys = new[] { "invalid" },
-                TransactionContext = Serializer.ToString((txSvcTests.tx, txSvcTests.spentCoins))
+                TransactionContext = SerializeContext(txSvcTests.tx, txSvcTests.spentCoins)
             });
 
             // Act
