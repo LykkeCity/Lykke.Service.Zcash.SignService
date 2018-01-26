@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Text;
-using Lykke.Service.Zcash.SignService.Core.Services;
+﻿using Lykke.Service.Zcash.SignService.Core.Services;
 using Lykke.Service.Zcash.SignService.Models;
 using Lykke.Service.Zcash.SignService.Models.Sign;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Lykke.Service.Zcash.SignService.Controllers
 {
@@ -32,7 +27,7 @@ namespace Lykke.Service.Zcash.SignService.Controllers
 
             var tx = _signService.Sign(signRequest.Tx, signRequest.Coins, signRequest.Keys);
 
-            return Ok(new SignTransactionResponse(tx));
+            return Ok(new SignTransactionResponse(tx, signRequest.Coins));
         }
     }
 }

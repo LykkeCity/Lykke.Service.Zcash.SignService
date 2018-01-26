@@ -51,14 +51,13 @@ namespace Lykke.Service.Zcash.SignService.Tests
             // Arrange
             
             // Act
-            var signedTransactionHex = service.Sign(tx, spentCoins, new[] { fromKey });
-            var signedTx = Transaction.Parse(signedTransactionHex);
+            var signedTransaction = service.Sign(tx, spentCoins, new[] { fromKey });
 
             // Assert
             Assert.True(new TransactionBuilder()
                 .AddCoins(spentCoins)
                 .SetTransactionPolicy(new StandardTransactionPolicy { CheckFee = false })
-                .Verify(signedTx, out var errors));
+                .Verify(signedTransaction, out var errors));
         }
     }
 }

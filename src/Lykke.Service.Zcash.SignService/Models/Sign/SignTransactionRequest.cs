@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
+using Common;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using NBitcoin;
 using NBitcoin.JsonConverters;
@@ -41,7 +40,7 @@ namespace Lykke.Service.Zcash.SignService.Models.Sign
             {
                 try
                 {
-                    (Tx, Coins) = Serializer.ToObject<(Transaction, ICoin[])>(Encoding.UTF8.GetString(Convert.FromBase64String(TransactionContext)));
+                    (Tx, Coins) = Serializer.ToObject<(Transaction, ICoin[])>(TransactionContext.Base64ToString());
                 }
                 catch
                 {
