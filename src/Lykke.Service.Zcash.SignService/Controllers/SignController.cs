@@ -1,4 +1,5 @@
-﻿using Lykke.Service.Zcash.SignService.Core.Services;
+﻿using System.Threading.Tasks;
+using Lykke.Service.Zcash.SignService.Core.Services;
 using Lykke.Service.Zcash.SignService.Models;
 using Lykke.Service.Zcash.SignService.Models.Sign;
 using Microsoft.AspNetCore.Mvc;
@@ -18,16 +19,17 @@ namespace Lykke.Service.Zcash.SignService.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(SignTransactionResponse), 200)]
         [ProducesResponseType(typeof(ErrorResponse), 400)]
-        public IActionResult SignTransaction([FromBody]SignTransactionRequest signRequest)
+        public async Task<IActionResult> SignTransaction([FromBody]SignTransactionRequest signRequest)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ErrorResponse.Create(ModelState));
             }
 
-            var tx = _signService.Sign(signRequest.Tx, signRequest.Coins, signRequest.Keys);
-
-            return Ok(new SignTransactionResponse(tx, signRequest.Coins));
+            return Ok(new SignTransactionResponse()
+            {
+                SignedTransaction = await _signService.Sign(signRequest.Tx, signRequest.Outputs, signRequest.PrivateKeys)
+            });
         }
     }
 }
