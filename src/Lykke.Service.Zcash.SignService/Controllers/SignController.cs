@@ -28,7 +28,7 @@ namespace Lykke.Service.Zcash.SignService.Controllers
 
             return Ok(new SignTransactionResponse()
             {
-                SignedTransaction = await _signService.Sign(signRequest.Tx, signRequest.Outputs, signRequest.PrivateKeys)
+                SignedTransaction = await _signService.Sign(signRequest.Tx, signRequest.SpentOutputs, signRequest.PrivateKeys)
             });
         }
     }

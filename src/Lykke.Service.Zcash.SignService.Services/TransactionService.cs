@@ -17,7 +17,7 @@ namespace Lykke.Service.Zcash.SignService.Services
             _rpcClient = rpcClient;
         }
 
-        public async Task<string> Sign(string tx, Output[] outputs, string[] keys)
+        public async Task<string> Sign(string tx, Utxo[] outputs, string[] keys)
         {
             var result = await _rpcClient.SendCommandAsync(RPCOperations.signrawtransaction, tx, outputs, keys);
 

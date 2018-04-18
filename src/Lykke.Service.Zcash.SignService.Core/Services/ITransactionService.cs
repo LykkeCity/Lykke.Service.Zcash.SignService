@@ -6,6 +6,6 @@ namespace Lykke.Service.Zcash.SignService.Core.Services
 {
     public interface ITransactionService
     {
-        Task<string> Sign(string tx, Output[] outputs, string[] keys);
+        Task<string> Sign(string tx, Utxo[] outputs, string[] keys);
     }
 }

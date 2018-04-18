@@ -24,7 +24,7 @@ namespace Lykke.Service.Zcash.SignService.Models.Sign
         public string Tx { get; private set; }
 
         [ValidateNever]
-        public Output[] Outputs { get; private set; }
+        public Utxo[] SpentOutputs { get; private set; }
                                                         
         [OnDeserialized]
         public void Init(StreamingContext streamingContext = default)
@@ -32,15 +32,15 @@ namespace Lykke.Service.Zcash.SignService.Models.Sign
             // leave properties null if deserialization fails, 
             // see Validate for actual validation
 
-            if (Tx == null && Outputs == null)
+            if (Tx == null && SpentOutputs == null)
             {
                 try
                 {
-                    (Tx, Outputs) = JsonConvert.DeserializeObject<(string, Output[])>(TransactionContext.Base64ToString());
+                    (Tx, SpentOutputs) = JsonConvert.DeserializeObject<(string, Utxo[])>(TransactionContext.Base64ToString());
                 }
                 catch
                 {
-                    (Tx, Outputs) = (null, null);
+                    (Tx, SpentOutputs) = (null, null);
                 }
             }
         }
@@ -51,7 +51,7 @@ namespace Lykke.Service.Zcash.SignService.Models.Sign
 
             Init();
 
-            if (Tx == null || Outputs == null || Outputs.Length == 0)
+            if (Tx == null || SpentOutputs == null || SpentOutputs.Length == 0)
             {
                 result.Add(new ValidationResult("Invalid transaction data", new[] { nameof(TransactionContext) }));
             }
