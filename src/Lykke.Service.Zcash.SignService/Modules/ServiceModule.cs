@@ -65,8 +65,6 @@ namespace Lykke.Service.Zcash.SignService.Modules
             builder.RegisterType<WalletService>()
                 .As<IWalletService>();
 
-            // TODO: Add your dependencies here
-
             builder.Populate(_services);
         }
     }
