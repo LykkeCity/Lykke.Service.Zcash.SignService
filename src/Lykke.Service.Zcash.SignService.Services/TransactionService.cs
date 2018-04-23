@@ -37,11 +37,27 @@ namespace Lykke.Service.Zcash.SignService.Services
 
         public async Task<bool> ValidateNotSignedTransactionAsync(string transaction)
         {
-            var result = await SendRpcAsync<RawTransaction>(RPCOperations.decoderawtransaction, transaction)
-                .ConfigureAwait(false);
+            if (string.IsNullOrEmpty(transaction))
+            {
+                return false;
+            }
 
-            return result != null &&
-                result.Vin.All(vin => vin.ScriptSig == null || (string.IsNullOrEmpty(vin.ScriptSig.Asm) && string.IsNullOrEmpty(vin.ScriptSig.Hex)));
+            try
+            {
+                var result = await SendRpcAsync<RawTransaction>(RPCOperations.decoderawtransaction, transaction)
+                    .ConfigureAwait(false);
+
+                return result != null &&
+                    result.Vin.All(vin => vin.ScriptSig == null || (string.IsNullOrEmpty(vin.ScriptSig.Asm) && string.IsNullOrEmpty(vin.ScriptSig.Hex)));
+            }
+            catch (Exception ex)
+            {
+                await _log.WriteWarningAsync(nameof(ValidateNotSignedTransactionAsync),
+                    $"Transaction: {transaction}, Error: {ex.ToString()}",
+                    $"Error while decoding transaction");
+
+                return false;
+            }
         }
 
         public async Task<T> SendRpcAsync<T>(RPCOperations command, params object[] parameters)
