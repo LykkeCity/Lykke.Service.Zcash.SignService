@@ -4,7 +4,10 @@ using System.Threading.Tasks;
 using Common.Log;
 using Lykke.Service.Zcash.SignService.Core.Domain.Transactions;
 using Lykke.Service.Zcash.SignService.Core.Services;
+using NBitcoin;
+using NBitcoin.DataEncoders;
 using NBitcoin.RPC;
+using NBitcoin.Zcash;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -13,17 +16,72 @@ namespace Lykke.Service.Zcash.SignService.Services
     public class TransactionService : ITransactionService
     {
         private readonly ILog _log;
-        private readonly RPCClient _rpcClient;
+        private readonly IBlockchainReader _blockchainReader;
+        private readonly bool _isLocal;
 
-        public TransactionService(ILog log, RPCClient rpcClient)
+        public TransactionService(ILog log, IBlockchainReader blockchainReader = null)
         {
             _log = log;
-            _rpcClient = rpcClient;
+            _blockchainReader = blockchainReader;
+            _isLocal = _blockchainReader == null;
         }
 
         public async Task<string> SignAsync(string tx, Utxo[] outputs, string[] keys)
         {
-            var result = await SendRpcAsync<SignResult>(RPCOperations.signrawtransaction, tx, JArray.FromObject(outputs), keys);
+            if (_isLocal)
+            {
+                return SignLocally(tx, outputs, keys);
+            }
+            else
+            {
+                return await SignRemotelyAsync(tx, outputs, keys);
+            }
+        }
+
+        public async Task<bool> ValidateNotSignedTransactionAsync(string tx)
+        {
+            if (string.IsNullOrEmpty(tx))
+            {
+                return false;
+            }
+
+            try
+            {
+                if (_isLocal)
+                {
+                    return ValidateNotSignedTransactionLocally(tx);
+                }
+                else
+                {
+                    return await ValidateNotSignedTransactionRemotelyAsync(tx);
+                }
+            }
+            catch (Exception ex)
+            {
+                await _log.WriteWarningAsync(nameof(ValidateNotSignedTransactionAsync), 
+                    $"IsLocal: {_isLocal}, Transaction: {tx}, Error: {ex}",
+                    $"Error while decoding transaction");
+
+                return false;
+            }
+        }
+
+        private string SignLocally(string tx, Utxo[] outputs, string[] keys)
+        {
+            var transaction = new ZcashTransaction(tx);
+            var privateKeys = keys.Select(k => Key.Parse(k)).ToArray();
+            var coins = outputs
+                .Select(x => new Coin(uint256.Parse(x.TxId), x.Vout, Money.Coins(x.Amount), new Script(Encoders.Hex.DecodeData(x.ScriptPubKey))))
+                .ToArray();
+
+            transaction.Sign(privateKeys, coins);
+
+            return transaction.ToHex(); 
+        }
+
+        private async Task<string> SignRemotelyAsync(string tx, Utxo[] outputs, string[] keys)
+        {
+            var result = await _blockchainReader.SignRawTransaction(tx, outputs, keys);
 
             if (result.Complete)
             {
@@ -35,54 +93,17 @@ namespace Lykke.Service.Zcash.SignService.Services
             }
         }
 
-        public async Task<bool> ValidateNotSignedTransactionAsync(string transaction)
+        private bool ValidateNotSignedTransactionLocally(string tx)
         {
-            if (string.IsNullOrEmpty(transaction))
-            {
-                return false;
-            }
-
-            try
-            {
-                var result = await SendRpcAsync<RawTransaction>(RPCOperations.decoderawtransaction, transaction)
-                    .ConfigureAwait(false);
-
-                return result != null &&
-                    result.Vin.All(vin => vin.ScriptSig == null || (string.IsNullOrEmpty(vin.ScriptSig.Asm) && string.IsNullOrEmpty(vin.ScriptSig.Hex)));
-            }
-            catch (Exception ex)
-            {
-                await _log.WriteWarningAsync(nameof(ValidateNotSignedTransactionAsync),
-                    $"Transaction: {transaction}, Error: {ex.ToString()}",
-                    $"Error while decoding transaction");
-
-                return false;
-            }
+            return new ZcashTransaction(tx).Inputs.All(vin => vin.ScriptSig == null || vin.ScriptSig.Length == 0);
         }
 
-        public async Task<T> SendRpcAsync<T>(RPCOperations command, params object[] parameters)
+        private async Task<bool> ValidateNotSignedTransactionRemotelyAsync(string tx)
         {
-            var result = await _rpcClient.SendCommandAsync(command, parameters)
-                .ConfigureAwait(false);
+            var result = await _blockchainReader.DecodeRawTransaction(tx);
 
-            result.ThrowIfError();
-
-            // starting from Overwinter update NBitcoin can not deserialize Zcash transaparent transactions,
-            // as well as it has never been able to work with shielded Zcash transactions,
-            // that's why custom models are used widely instead of built-in NBitcoin commands;
-            // additionaly in case of exception we save context to investigate later:
-
-            try
-            {
-                return result.Result.ToObject<T>();
-            }
-            catch (JsonSerializationException jex)
-            {
-                await _log.WriteErrorAsync(nameof(SendRpcAsync), $"Command: {command}, Response: {result.ResultString}", jex)
-                    .ConfigureAwait(false);
-
-                throw;
-            }
+            return result != null &&
+                result.Vin.All(vin => vin.ScriptSig == null || (string.IsNullOrEmpty(vin.ScriptSig.Asm) && string.IsNullOrEmpty(vin.ScriptSig.Hex)));
         }
     }
 }
