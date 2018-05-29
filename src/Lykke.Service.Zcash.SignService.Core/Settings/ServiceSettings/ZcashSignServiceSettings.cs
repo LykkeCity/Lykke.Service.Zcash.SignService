@@ -4,5 +4,7 @@
     {
         public DbSettings Db { get; set; }
         public string NetworkType { get; set; }
+        public string RpcAuthenticationString { get; set; }
+        public string RpcUrl { get; set; }
     }
 }

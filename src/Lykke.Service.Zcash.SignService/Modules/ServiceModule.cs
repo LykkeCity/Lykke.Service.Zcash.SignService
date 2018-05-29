@@ -7,6 +7,7 @@ using Lykke.Service.Zcash.SignService.Services;
 using Lykke.SettingsReader;
 using Microsoft.Extensions.DependencyInjection;
 using NBitcoin;
+using NBitcoin.RPC;
 using NBitcoin.Zcash;
 
 namespace Lykke.Service.Zcash.SignService.Modules
@@ -53,13 +54,16 @@ namespace Lykke.Service.Zcash.SignService.Modules
             builder.RegisterInstance(Network.GetNetwork(_settings.CurrentValue.NetworkType))
                 .As<Network>();
 
+            builder.RegisterType<RPCClient>()
+                .AsSelf()
+                .WithParameter("authenticationString", _settings.CurrentValue.RpcAuthenticationString)
+                .WithParameter("hostOrUri", _settings.CurrentValue.RpcUrl);
+
             builder.RegisterType<TransactionService>()
                 .As<ITransactionService>();
 
             builder.RegisterType<WalletService>()
                 .As<IWalletService>();
-
-            // TODO: Add your dependencies here
 
             builder.Populate(_services);
         }

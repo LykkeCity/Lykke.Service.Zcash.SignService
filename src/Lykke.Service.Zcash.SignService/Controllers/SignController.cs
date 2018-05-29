@@ -1,4 +1,6 @@
-﻿using Lykke.Service.Zcash.SignService.Core.Services;
+﻿using System.Threading.Tasks;
+using Lykke.Service.Zcash.SignService.Core.Services;
+using Lykke.Service.Zcash.SignService.Helpers;
 using Lykke.Service.Zcash.SignService.Models;
 using Lykke.Service.Zcash.SignService.Models.Sign;
 using Microsoft.AspNetCore.Mvc;
@@ -8,26 +10,30 @@ namespace Lykke.Service.Zcash.SignService.Controllers
     [Route("/api/sign")]
     public class SignController : Controller
     {
-        private readonly ITransactionService _signService;
+        private readonly ITransactionService _transactionService;
 
-        public SignController(ITransactionService signService)
+        public SignController(ITransactionService transactionService)
         {
-            _signService = signService;
+            _transactionService = transactionService;
         }
 
         [HttpPost]
         [ProducesResponseType(typeof(SignTransactionResponse), 200)]
         [ProducesResponseType(typeof(ErrorResponse), 400)]
-        public IActionResult SignTransaction([FromBody]SignTransactionRequest signRequest)
+        public async Task<IActionResult> SignTransaction([FromBody]SignTransactionRequest signRequest)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid ||
+                !ModelState.IsValidRequest(signRequest, _transactionService, out var tx, out var spentOutputs))
             {
                 return BadRequest(ErrorResponse.Create(ModelState));
             }
 
-            var tx = _signService.Sign(signRequest.Tx, signRequest.Coins, signRequest.Keys);
+            var signed = await _transactionService.SignAsync(tx, spentOutputs, signRequest.PrivateKeys);
 
-            return Ok(new SignTransactionResponse(tx, signRequest.Coins));
+            return Ok(new SignTransactionResponse()
+            {
+                SignedTransaction = signed
+            });
         }
     }
 }
