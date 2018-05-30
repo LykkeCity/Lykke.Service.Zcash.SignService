@@ -49,15 +49,22 @@ namespace Lykke.Service.Zcash.SignService.Modules
             builder.RegisterType<ShutdownManager>()
                 .As<IShutdownManager>();
 
-            ZcashNetworks.Register();
+            ZcashNetworks.Instance.EnsureRegistered();
 
             builder.RegisterInstance(Network.GetNetwork(_settings.CurrentValue.NetworkType))
                 .As<Network>();
 
-            builder.RegisterType<RPCClient>()
-                .AsSelf()
-                .WithParameter("authenticationString", _settings.CurrentValue.RpcAuthenticationString)
-                .WithParameter("hostOrUri", _settings.CurrentValue.RpcUrl);
+            if (!string.IsNullOrEmpty(_settings.CurrentValue.RpcAuthenticationString) &&
+                !string.IsNullOrEmpty(_settings.CurrentValue.RpcUrl))
+            {
+                builder.RegisterType<RPCClient>()
+                    .AsSelf()
+                    .WithParameter("authenticationString", _settings.CurrentValue.RpcAuthenticationString)
+                    .WithParameter("hostOrUri", _settings.CurrentValue.RpcUrl);
+
+                builder.RegisterType<BlockchainReader>()
+                    .As<IBlockchainReader>();
+            }
 
             builder.RegisterType<TransactionService>()
                 .As<ITransactionService>();
