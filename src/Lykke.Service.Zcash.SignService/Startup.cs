@@ -85,8 +85,6 @@ namespace Lykke.Service.Zcash.SignService
                     app.UseDeveloperExceptionPage();
                 }
 
-                app.UseLykkeMiddleware("Zcash.SignService", ex => new { Message = ex.ToString() }, logClientErrors: true);
-
                 app.UseMvc();
                 app.UseSwagger(c =>
                 {

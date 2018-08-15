@@ -15,13 +15,11 @@ namespace Lykke.Service.Zcash.SignService.Services
 {
     public class TransactionService : ITransactionService
     {
-        private readonly ILog _log;
         private readonly IBlockchainReader _blockchainReader;
         private readonly bool _isLocal;
 
-        public TransactionService(ILog log, IBlockchainReader blockchainReader = null)
+        public TransactionService(IBlockchainReader blockchainReader = null)
         {
-            _log = log;
             _blockchainReader = blockchainReader;
             _isLocal = _blockchainReader == null;
         }
@@ -56,12 +54,8 @@ namespace Lykke.Service.Zcash.SignService.Services
                     return await ValidateNotSignedTransactionRemotelyAsync(tx);
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                await _log.WriteWarningAsync(nameof(ValidateNotSignedTransactionAsync), 
-                    $"IsLocal: {_isLocal}, Transaction: {tx}, Error: {ex}",
-                    $"Error while decoding transaction");
-
                 return false;
             }
         }
