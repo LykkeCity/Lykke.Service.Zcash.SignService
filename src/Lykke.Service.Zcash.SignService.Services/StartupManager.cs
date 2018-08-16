@@ -13,13 +13,6 @@ namespace Lykke.Service.Zcash.SignService.Services
 
     public class StartupManager : IStartupManager
     {
-        private readonly ILog _log;
-
-        public StartupManager(ILog log)
-        {
-            _log = log;
-        }
-
         public async Task StartAsync()
         {
             // TODO: Implement your startup logic here. Good idea is to log every step
