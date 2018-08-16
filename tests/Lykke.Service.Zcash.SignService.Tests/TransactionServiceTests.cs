@@ -1,14 +1,8 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-using Common.Log;
+﻿using System.Threading.Tasks;
 using Lykke.Service.Zcash.SignService.Core.Domain.Transactions;
 using Lykke.Service.Zcash.SignService.Services;
 using Moq;
-using NBitcoin;
-using NBitcoin.JsonConverters;
-using NBitcoin.Policy;
 using NBitcoin.Zcash;
-using Newtonsoft.Json;
 using Xunit;
 
 namespace Lykke.Service.Zcash.SignService.Tests
