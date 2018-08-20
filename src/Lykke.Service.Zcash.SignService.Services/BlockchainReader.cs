@@ -12,12 +12,10 @@ namespace Lykke.Service.Zcash.SignService.Services
 {
     public class BlockchainReader : IBlockchainReader
     {
-        private readonly ILog _log;
         private readonly RPCClient _rpcClient;
 
-        public BlockchainReader(ILog log, RPCClient rpcClient)
+        public BlockchainReader(RPCClient rpcClient)
         {
-            _log = log;
             _rpcClient = rpcClient;
         }
 
@@ -36,24 +34,12 @@ namespace Lykke.Service.Zcash.SignService.Services
             var result = await _rpcClient.SendCommandAsync(command, parameters)
                 .ConfigureAwait(false);
 
-            result.ThrowIfError();
-
             // starting from Overwinter update NBitcoin can not deserialize Zcash transaparent transactions,
             // as well as it has never been able to work with shielded Zcash transactions,
             // that's why custom models are used widely instead of built-in NBitcoin commands;
             // additionaly in case of exception we save context to investigate later:
 
-            try
-            {
-                return result.Result.ToObject<T>();
-            }
-            catch (JsonSerializationException jex)
-            {
-                await _log.WriteErrorAsync(nameof(SendRpcAsync), $"Command: {command}, Response: {result.ResultString}", jex)
-                    .ConfigureAwait(false);
-
-                throw;
-            }
+            return result.Result.ToObject<T>();
         }
     }
 }

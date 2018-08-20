@@ -1,21 +1,14 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-using Common.Log;
+﻿using System.Threading.Tasks;
 using Lykke.Service.Zcash.SignService.Core.Domain.Transactions;
 using Lykke.Service.Zcash.SignService.Services;
 using Moq;
-using NBitcoin;
-using NBitcoin.JsonConverters;
-using NBitcoin.Policy;
 using NBitcoin.Zcash;
-using Newtonsoft.Json;
 using Xunit;
 
 namespace Lykke.Service.Zcash.SignService.Tests
 {
     public class TransactionServiceTests
     {
-        public ILog _log = new LogToMemory();
         public Mock<IBlockchainReader> _blockchainReader = new Mock<IBlockchainReader>();
         public string _tx = "030000807082c40301ac3e4e9435a8369e049b47906ddaa09601cd7e7cfe2f229e0bd305202a066f8e0100000000ffffffff0280969800000000001976a91415b6246e9b88867cdc3e14b9a5085813ca6d8b4888acc9180202000000001976a9144faeeb51bcd0b49f238b323e5f1c6c8bf11ae02a88ac000000005782030000";
         public string[] _privateKeys = new[] { "cTD2Ew71UHXkn2XTJLyfu6Rbo1os5zCF9sKZm4oiXshcYo6YPcKY" };
@@ -40,7 +33,7 @@ namespace Lykke.Service.Zcash.SignService.Tests
         public async Task ShouldSignLocally()
         {
             // Arrange
-            var transactionService = new TransactionService(_log);
+            var transactionService = new TransactionService();
 
             // Act
             var signed = await transactionService.SignAsync(_tx, _outputs, _privateKeys);
@@ -53,7 +46,7 @@ namespace Lykke.Service.Zcash.SignService.Tests
         public async Task ShouldSignRemotely()
         {
             // Arrange
-            var transactionService = new TransactionService(_log, _blockchainReader.Object);
+            var transactionService = new TransactionService(_blockchainReader.Object);
 
             // Act
             var signed = await transactionService.SignAsync(_tx, _outputs, _privateKeys);
@@ -66,7 +59,7 @@ namespace Lykke.Service.Zcash.SignService.Tests
         public async Task ShouldValidateLocally()
         {
             // Arrange
-            var transactionService = new TransactionService(_log);
+            var transactionService = new TransactionService();
 
             // Act
             var isValid = await transactionService.ValidateNotSignedTransactionAsync(_tx);
@@ -79,7 +72,7 @@ namespace Lykke.Service.Zcash.SignService.Tests
         public async Task ShouldValidateRemotely()
         {
             // Arrange
-            var transactionService = new TransactionService(_log, _blockchainReader.Object);
+            var transactionService = new TransactionService(_blockchainReader.Object);
 
             // Act
             var signed = await transactionService.ValidateNotSignedTransactionAsync(_tx);

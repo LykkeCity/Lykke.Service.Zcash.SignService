@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Text;
-using Lykke.Service.Zcash.SignService.Core.Services;
+﻿using Lykke.Service.Zcash.SignService.Core.Services;
 using Lykke.Service.Zcash.SignService.Models.Wallets;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Lykke.Service.Zcash.SignService.Controllers
 {
