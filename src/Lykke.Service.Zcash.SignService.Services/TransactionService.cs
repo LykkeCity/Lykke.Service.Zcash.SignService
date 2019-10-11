@@ -24,11 +24,11 @@ namespace Lykke.Service.Zcash.SignService.Services
             _isLocal = _blockchainReader == null;
         }
 
-        public async Task<string> SignAsync(string tx, Utxo[] outputs, string[] keys)
+        public async Task<string> SignAsync(string tx, Utxo[] outputs, string[] keys, uint? branchId = null)
         {
             if (_isLocal)
             {
-                return SignLocally(tx, outputs, keys);
+                return SignLocally(tx, outputs, keys, branchId);
             }
             else
             {
@@ -60,9 +60,9 @@ namespace Lykke.Service.Zcash.SignService.Services
             }
         }
 
-        private string SignLocally(string tx, Utxo[] outputs, string[] keys)
+        private string SignLocally(string tx, Utxo[] outputs, string[] keys, uint? branchId)
         {
-            var transaction = new ZcashTransaction(tx);
+            var transaction = new ZcashTransaction(tx, branchId);
             var privateKeys = keys.Select(k => Key.Parse(k)).ToArray();
             var coins = outputs
                 .Select(x => new Coin(uint256.Parse(x.TxId), x.Vout, Money.Coins(x.Amount), new Script(Encoders.Hex.DecodeData(x.ScriptPubKey))))
