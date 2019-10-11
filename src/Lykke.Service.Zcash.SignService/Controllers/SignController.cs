@@ -23,12 +23,12 @@ namespace Lykke.Service.Zcash.SignService.Controllers
         public async Task<IActionResult> SignTransaction([FromBody]SignTransactionRequest signRequest)
         {
             if (!ModelState.IsValid ||
-                !ModelState.IsValidRequest(signRequest, _transactionService, out var tx, out var spentOutputs))
+                !ModelState.IsValidRequest(signRequest, _transactionService, out var tx, out var spentOutputs, out var branchId))
             {
                 return BadRequest(ErrorResponse.Create(ModelState));
             }
 
-            var signed = await _transactionService.SignAsync(tx, spentOutputs, signRequest.PrivateKeys);
+            var signed = await _transactionService.SignAsync(tx, spentOutputs, signRequest.PrivateKeys, branchId);
 
             return Ok(new SignTransactionResponse()
             {
