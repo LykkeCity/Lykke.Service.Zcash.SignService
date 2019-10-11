@@ -13,10 +13,12 @@ namespace Lykke.Service.Zcash.SignService.Helpers
             SignTransactionRequest request,
             ITransactionService transactionService,
             out string tx,
-            out Utxo[] spentOutputs)
+            out Utxo[] spentOutputs,
+            out uint? branchId)
         {
             tx = null;
             spentOutputs = null;
+            branchId = null;
 
             if (!self.IsValid)
             {
@@ -25,7 +27,7 @@ namespace Lykke.Service.Zcash.SignService.Helpers
 
             try
             {
-                (tx, spentOutputs) = JsonConvert.DeserializeObject<(string, Utxo[])>(request.TransactionContext.Base64ToString());
+                (tx, spentOutputs, branchId) = JsonConvert.DeserializeObject<(string, Utxo[], uint?)>(request.TransactionContext.Base64ToString());
             }
             catch
             {
